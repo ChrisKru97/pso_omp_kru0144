@@ -1,0 +1,38 @@
+add_executable(main main.cpp)
+add_library(testLib STATIC testLib.cpp)
+add_library(testLib2 testLib2.cpp)
+
+set_target_properties(
+    main
+
+    PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build
+)
+
+set_target_properties(
+    testLib
+
+    PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build
+)
+
+
+set_target_properties(
+    testLib2
+
+    PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build
+)
+
+
+target_link_libraries(
+    main PUBLIC
+        ${PROJECT_SOURCE_DIR}/src/testLib2.cpp
+        ${PROJECT_SOURCE_DIR}/src/testLib.cpp
+)
+
+target_include_directories(
+        main PUBLIC
+    ${PROJECT_SOURCE_DIR}/include
+    ${exprtk_SOURCE_DIR}/
+)

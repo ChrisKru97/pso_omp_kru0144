@@ -1,0 +1,16 @@
+cmake_minimum_required(VERSION 3.13)
+project(HandsOn3)
+
+find_package(Git REQUIRED)
+
+include(FetchContent)
+
+FetchContent_Declare(
+    exprtk
+    GIT_REPOSITORY https://github.com/ArashPartow/exprtk.git
+)
+FetchContent_MakeAvailable(exprtk)
+
+message("exprtk source dir: ${exprtk_SOURCE_DIR}")
+
+add_subdirectory(src)
