@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <omp.h>
+#include <time.h>
 
 #define for_i_swarm for (int i = 0; i < swarm_size; i++)
 #define for_j_dimensions for (int j = 0; j < dimensions; j++)
@@ -36,12 +37,14 @@ int find_global_best(double **swarm, int swarm_size, int particle_dimensions)
     return best_index;
 }
 
-void calculate_next_velocity(double *velocity, double inertia, int dimensions, double *global_best, double *personal_best, double *current_position)
+void calculate_next_velocity(double *velocity, double inertia, int dimensions, double *global_best, double *personal_best, double *current_position) 
 {
     double next_velocity;
+    double rand1 = 1.0 * rand() / RAND_MAX;
+    double rand2 = 1.0 * rand() / RAND_MAX;
     for_j_dimensions
     {
-        next_velocity = inertia * velocity[j] + c1 * rand() * (personal_best[j] - current_position[j]) / RAND_MAX + c2 * rand() * (global_best[j] - current_position[j]) / RAND_MAX;
+        next_velocity = inertia * velocity[j] + c1 * rand1 * (personal_best[j] - current_position[j]) + c2 * rand2 * (global_best[j] - current_position[j]);
         if (next_velocity > v_max)
         {
             next_velocity = v_max;
@@ -100,6 +103,7 @@ void deallocate_data(double ***swarm, int swarm_size)
 
 void run_pso(double **swarm, double (*objective_function)(double *, int), int swarm_size, int dimensions, int m_max, bool verbose)
 {
+    srand(time(NULL));
     if (verbose)
         printf("Preparing data for PSO\n");
     double ***swarm_data = prepare_data(swarm, objective_function, swarm_size, dimensions);
