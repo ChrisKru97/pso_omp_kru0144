@@ -1,11 +1,10 @@
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
-#include <omp.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
-#include "../lib/pso.h"
+#include "pso.h"
 
 #define for_i_swarm for (int i = 0; i < swarm_size; i++)
 #define for_j_dimensions for (int j = 0; j < dimensions; j++)
@@ -21,8 +20,6 @@ double objective_function(double *particle, int dimensions)
 {
     double result = 0;
 
-#pragma omp parallel for reduction(+ \
-                                   : result)
     for_j_dimensions
     {
         result += pow(particle[j], 2);
@@ -32,24 +29,25 @@ double objective_function(double *particle, int dimensions)
 
 double **generate_swarm(int swarm_size, int dimensions, double max_value)
 {
+    srand(time(NULL));
     double **result;
     double random_value;
     unsigned int seed;
 
     result = malloc(swarm_size * dimensions * sizeof(double));
 
-#pragma omp parallel for private(seed) shared(result)
+    // #pragma omp parallel for private(seed) shared(result)
     for_i_swarm
     {
         // trying to get unique seed
-        seed = (time(NULL)) ^ (omp_get_thread_num() + 1 + 10 * i);
+        // seed = (time(NULL)) ^ (omp_get_thread_num() + 1 + 10 * i);
         result[i] = malloc(dimensions * sizeof(double));
 
         for_j_dimensions
         {
             // flush first value, since it is not really random
-            rand_r(&seed);
-            random_value = 2 * max_value * rand_r(&seed) / RAND_MAX - max_value;
+            // rand_r(&seed);
+            random_value = 2 * max_value * rand() / RAND_MAX - max_value;
             result[i][j] = random_value;
         }
     }

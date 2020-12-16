@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
+#include <omp.h>
 
 #define for_i_swarm for (int i = 0; i < swarm_size; i++)
 #define for_j_dimensions for (int j = 0; j < dimensions; j++)
@@ -24,7 +25,7 @@ double get_inertia(int iteration, int m_max)
 int find_global_best(double **swarm, int swarm_size, int particle_dimensions)
 {
     int best_index = 0;
-#pragma omp parallel for
+#pragma omp parallel for shared(best_index);
     for_i_swarm
     {
         if (swarm[i][particle_dimensions] < swarm[best_index][particle_dimensions])
@@ -69,6 +70,7 @@ double ***prepare_data(double **swarm, double (*objective_function)(double *, in
     // Personal best position in history
     result[2] = malloc(values_size);
 
+#pragma omp parallel for default(shared)
     for_i_swarm
     {
         result[0][i] = malloc(dimension_size + sizeof(double));
@@ -87,12 +89,10 @@ void deallocate_data(double ***swarm, int swarm_size)
 {
     for (int k = 0; k < 3; k++)
     {
-        /*
-    for_i_swarm
+        /*for_i_swarm
     {
         free(swarm[k][i]);
-    }
-*/
+    }*/
         free(swarm[k]);
     }
     free(swarm);
@@ -113,7 +113,7 @@ void run_pso(double **swarm, double (*objective_function)(double *, int), int sw
     for (int m = 0; m < m_max; m++)
     {
         inertia = get_inertia(m, m_max);
-#pragma omp parallel for
+#pragma omp parallel for default(shared)
         for_i_swarm
         {
             calculate_next_velocity(swarm_data[1][i], inertia, dimensions, swarm_data[0][global_best_index], swarm_data[2][i], swarm_data[0][i]);
