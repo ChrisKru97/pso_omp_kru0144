@@ -25,7 +25,7 @@ double get_inertia(int iteration, int m_max)
 int find_global_best(double **swarm, int swarm_size, int particle_dimensions)
 {
     int best_index = 0;
-#pragma omp parallel for shared(best_index);
+#pragma omp parallel for shared(best_index)
     for_i_swarm
     {
         if (swarm[i][particle_dimensions] < swarm[best_index][particle_dimensions])
